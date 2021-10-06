@@ -5,6 +5,9 @@ from app.models.eisenhower_model import Eisenhower
 from app.models.task_model import Task
 from flask import current_app, request
 
+from dataclasses import asdict
+
+import pdb
 
 def create() -> dict:
     data = request.get_json()
@@ -22,20 +25,16 @@ def create() -> dict:
         data = get_and_create_category(data)
         data.pop('categories')
 
-        tasks = Task(**data)
+        add_task = Task(**data)
         session = current_app.db.session
-        session.add(tasks)
+        session.add(add_task)
         session.commit()
 
+        task = asdict(add_task)
+        task['category'] = add_task.category
+        task['eisenhower_classification'] = eisenhower.type
 
-        return {
-            "id": tasks.id,
-            "name": tasks.name,
-            "description": tasks.description,
-            "duration": tasks.duration,
-            "eisenhower_classification": tasks.eisenhower_classification.type,
-            "category": tasks.category
-            }, 201
+        return task
     except ImportanceAndUrgencyError as err:
 
         return err.message, 404

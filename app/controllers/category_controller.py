@@ -4,6 +4,7 @@ import sqlalchemy
 from app.models.categorie_model import Categorie
 from flask import current_app, jsonify, request
 
+from psycopg2.errors import UniqueViolation
 
 def create():
     data = request.get_json()
