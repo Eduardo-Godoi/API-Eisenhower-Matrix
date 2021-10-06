@@ -1,3 +1,5 @@
+from dataclasses import asdict
+
 import sqlalchemy
 from app.exc.TasksError import ImportanceAndUrgencyError
 from app.models.categorie_model import Categorie
@@ -5,9 +7,6 @@ from app.models.eisenhower_model import Eisenhower
 from app.models.task_model import Task
 from flask import current_app, request
 
-from dataclasses import asdict
-
-import pdb
 
 def create() -> dict:
     data = request.get_json()
