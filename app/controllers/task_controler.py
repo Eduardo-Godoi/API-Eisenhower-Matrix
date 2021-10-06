@@ -25,16 +25,17 @@ def create() -> dict:
         data = get_and_create_category(data)
         data.pop('categories')
 
-        add_task = Task(**data)
+        task = Task(**data)
         session = current_app.db.session
-        session.add(add_task)
+        session.add(task)
         session.commit()
 
-        task = asdict(add_task)
-        task['category'] = add_task.category
-        task['eisenhower_classification'] = eisenhower.type
+        handle_task = asdict(task)
+        handle_task['duration'] = task.duration
+        handle_task['category'] = task.category
+        handle_task['eisenhower_classification'] = eisenhower.type
 
-        return task
+        return handle_task
     except ImportanceAndUrgencyError as err:
 
         return err.message, 404
@@ -65,15 +66,14 @@ def update(id: int):
             setattr(get_task, key, value)
 
         current_app.db.session.commit()
-        task = Task.query.get(id)
 
-        return {
-            "id": task.id,
-            "name": task.name,
-            "description": task.description,
-            "duration": task.duration,
-            "eisenhower_classification": task.eisenhower_classification.type,
-                }, 200
+        task = Task.query.get(id)
+        handle_task = asdict(task)
+        handle_task['eisenhower_classification'] = task.eisenhower_classification.type
+        handle_task['duration'] = task.duration
+
+        return handle_task, 200
+
     except AttributeError:
         return {'msg': 'task not found!'}, 404
 
